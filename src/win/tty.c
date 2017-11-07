@@ -1108,9 +1108,6 @@ static int uv__cancel_read_console(uv_tty_t* handle) {
 
 
 static void uv_tty_update_virtual_window(CONSOLE_SCREEN_BUFFER_INFO* info) {
-  int old_virtual_width = uv_tty_virtual_width;
-  int old_virtual_height = uv_tty_virtual_height;
-
   uv_tty_virtual_width = info->dwSize.X;
   uv_tty_virtual_height = info->srWindow.Bottom - info->srWindow.Top + 1;
 
@@ -2288,13 +2285,16 @@ static DWORD WINAPI uv__tty_console_resize_message_loop_thread(void* param) {
   uv__tty_console_width = sb_info.dwSize.X;
   uv__tty_console_height = sb_info.srWindow.Bottom - sb_info.srWindow.Top + 1;
 
-  if (!SetWinEventHook(EVENT_CONSOLE_LAYOUT,
-                       EVENT_CONSOLE_LAYOUT,
-                       NULL,
-                       uv__tty_console_resize_event,
-                       0,
-                       0,
-                       WINEVENT_OUTOFCONTEXT))
+  if (pSetWinEventHook == NULL)
+    return 0;
+
+  if (!pSetWinEventHook(EVENT_CONSOLE_LAYOUT,
+                        EVENT_CONSOLE_LAYOUT,
+                        NULL,
+                        uv__tty_console_resize_event,
+                        0,
+                        0,
+                        WINEVENT_OUTOFCONTEXT))
     return 0;
 
   while (GetMessage(&msg, NULL, 0, 0)) {
