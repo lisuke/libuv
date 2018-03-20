@@ -249,6 +249,12 @@ API
     - `UV_FS_COPYFILE_EXCL`: If present, `uv_fs_copyfile()` will fail with
       `UV_EEXIST` if the destination path already exists. The default behavior
       is to overwrite the destination if it exists.
+    - `UV_FS_COPYFILE_FICLONE`: If present, `uv_fs_copyfile()` will attempt to
+      create a copy-on-write reflink. If the underlying platform does not
+      support copy-on-write, then a fallback copy mechanism is used.
+    - `UV_FS_COPYFILE_FICLONE_FORCE`: If present, `uv_fs_copyfile()` will
+      attempt to create a copy-on-write reflink. If the underlying platform does
+      not support copy-on-write, then an error is returned.
 
     .. warning::
         If the destination path is created, but an error occurs while copying
@@ -257,6 +263,9 @@ API
         could access the file.
 
     .. versionadded:: 1.14.0
+
+    .. versionchanged:: 1.20.0 `UV_FS_COPYFILE_FICLONE` and
+        `UV_FS_COPYFILE_FICLONE_FORCE` are supported.
 
 .. c:function:: int uv_fs_sendfile(uv_loop_t* loop, uv_fs_t* req, uv_file out_fd, uv_file in_fd, int64_t in_offset, size_t length, uv_fs_cb cb)
 
@@ -340,6 +349,36 @@ API
     .. note::
         These functions are not implemented on Windows.
 
+.. c:function:: uv_fs_type uv_fs_get_type(const uv_fs_t* req)
+
+    Returns `req->fs_type`.
+
+    .. versionadded:: 1.19.0
+
+.. c:function:: ssize_t uv_fs_get_result(const uv_fs_t* req)
+
+    Returns `req->result`.
+
+    .. versionadded:: 1.19.0
+
+.. c:function:: void* uv_fs_get_ptr(const uv_fs_t* req)
+
+    Returns `req->ptr`.
+
+    .. versionadded:: 1.19.0
+
+.. c:function:: const char* uv_fs_get_path(const uv_fs_t* req)
+
+    Returns `req->path`.
+
+    .. versionadded:: 1.19.0
+
+.. c:function:: uv_stat_t* uv_fs_get_statbuf(uv_fs_t* req)
+
+    Returns `&req->statbuf`.
+
+    .. versionadded:: 1.19.0
+
 .. seealso:: The :c:type:`uv_req_t` API functions also apply.
 
 Helper functions
@@ -409,7 +448,9 @@ File open constants
     Atomically obtain an exclusive lock.
 
     .. note::
-        `UV_FS_O_EXLOCK` is only supported on macOS.
+        `UV_FS_O_EXLOCK` is only supported on macOS and Windows.
+
+    .. versionchanged:: 1.17.0 support is added for Windows.
 
 .. c:macro:: UV_FS_O_NOATIME
 

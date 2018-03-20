@@ -32,7 +32,6 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <net/if.h>
 
 #include <termios.h>
 #include <pwd.h>
@@ -49,6 +48,8 @@
 # include "uv-linux.h"
 #elif defined (__MVS__)
 # include "uv-os390.h"
+#elif defined(_PASE)
+# include "uv-posix.h"
 #elif defined(_AIX)
 # include "uv-aix.h"
 #elif defined(__sun)

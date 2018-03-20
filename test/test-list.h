@@ -28,6 +28,7 @@ TEST_DECLARE   (run_once)
 TEST_DECLARE   (run_nowait)
 TEST_DECLARE   (loop_alive)
 TEST_DECLARE   (loop_close)
+TEST_DECLARE   (loop_instant_close)
 TEST_DECLARE   (loop_stop)
 TEST_DECLARE   (loop_update_time)
 TEST_DECLARE   (loop_backend_timeout)
@@ -41,6 +42,7 @@ TEST_DECLARE   (condvar_2)
 TEST_DECLARE   (condvar_3)
 TEST_DECLARE   (condvar_4)
 TEST_DECLARE   (condvar_5)
+TEST_DECLARE   (condvar_6)
 TEST_DECLARE   (semaphore_1)
 TEST_DECLARE   (semaphore_2)
 TEST_DECLARE   (semaphore_3)
@@ -54,6 +56,7 @@ TEST_DECLARE   (tty_file)
 TEST_DECLARE   (tty_pty)
 TEST_DECLARE   (stdio_over_pipes)
 TEST_DECLARE   (ip6_pton)
+TEST_DECLARE   (connect_unspecified)
 TEST_DECLARE   (ipc_listen_before_write)
 TEST_DECLARE   (ipc_listen_after_write)
 #ifndef _WIN32
@@ -92,6 +95,7 @@ TEST_DECLARE   (tcp_bind_error_fault)
 TEST_DECLARE   (tcp_bind_error_inval)
 TEST_DECLARE   (tcp_bind_localhost_ok)
 TEST_DECLARE   (tcp_bind_invalid_flags)
+TEST_DECLARE   (tcp_bind_writable_flags)
 TEST_DECLARE   (tcp_listen_without_bind)
 TEST_DECLARE   (tcp_connect_error_fault)
 TEST_DECLARE   (tcp_connect_timeout)
@@ -214,6 +218,7 @@ TEST_DECLARE   (async_null_cb)
 TEST_DECLARE   (eintr_handling)
 TEST_DECLARE   (get_currentexe)
 TEST_DECLARE   (process_title)
+TEST_DECLARE   (process_title_threadsafe)
 TEST_DECLARE   (cwd_and_chdir)
 TEST_DECLARE   (get_memory)
 TEST_DECLARE   (get_passwd)
@@ -260,9 +265,11 @@ TEST_DECLARE   (spawn_closed_process_io)
 TEST_DECLARE   (spawn_reads_child_path)
 TEST_DECLARE   (spawn_inherit_streams)
 TEST_DECLARE   (spawn_quoted_path)
+TEST_DECLARE   (spawn_tcp_server)
 TEST_DECLARE   (fs_poll)
 TEST_DECLARE   (fs_poll_getpath)
 TEST_DECLARE   (kill)
+TEST_DECLARE   (kill_invalid_signum)
 TEST_DECLARE   (fs_file_noent)
 TEST_DECLARE   (fs_file_nametoolong)
 TEST_DECLARE   (fs_file_loop)
@@ -284,6 +291,7 @@ TEST_DECLARE   (fs_realpath)
 TEST_DECLARE   (fs_symlink)
 TEST_DECLARE   (fs_symlink_dir)
 #ifdef _WIN32
+TEST_DECLARE   (fs_symlink_junction)
 TEST_DECLARE   (fs_non_symlink_reparse_point)
 #endif
 TEST_DECLARE   (fs_utime)
@@ -293,6 +301,9 @@ TEST_DECLARE   (fs_stat_missing_path)
 TEST_DECLARE   (fs_read_file_eof)
 TEST_DECLARE   (fs_event_watch_dir)
 TEST_DECLARE   (fs_event_watch_dir_recursive)
+#ifdef _WIN32
+TEST_DECLARE   (fs_event_watch_dir_short_path)
+#endif
 TEST_DECLARE   (fs_event_watch_file)
 TEST_DECLARE   (fs_event_watch_file_exact_path)
 TEST_DECLARE   (fs_event_watch_file_twice)
@@ -321,6 +332,9 @@ TEST_DECLARE   (fs_write_alotof_bufs)
 TEST_DECLARE   (fs_write_alotof_bufs_with_offset)
 TEST_DECLARE   (fs_file_pos_after_op_with_offset)
 TEST_DECLARE   (fs_null_req)
+#ifdef _WIN32
+TEST_DECLARE   (fs_exclusive_sharing_mode)
+#endif
 TEST_DECLARE   (threadpool_queue_work_simple)
 TEST_DECLARE   (threadpool_queue_work_einval)
 TEST_DECLARE   (threadpool_multiple_event_loops)
@@ -393,6 +407,10 @@ HELPER_DECLARE (pipe_echo_server)
 
 TEST_DECLARE   (queue_foreach_delete)
 
+TEST_DECLARE   (handle_type_name)
+TEST_DECLARE   (req_type_name)
+TEST_DECLARE   (getters_setters)
+
 #ifndef _WIN32
 TEST_DECLARE  (fork_timer)
 TEST_DECLARE  (fork_socketpair)
@@ -418,6 +436,7 @@ TASK_LIST_START
   TEST_ENTRY  (run_nowait)
   TEST_ENTRY  (loop_alive)
   TEST_ENTRY  (loop_close)
+  TEST_ENTRY  (loop_instant_close)
   TEST_ENTRY  (loop_stop)
   TEST_ENTRY  (loop_update_time)
   TEST_ENTRY  (loop_backend_timeout)
@@ -431,6 +450,7 @@ TASK_LIST_START
   TEST_ENTRY  (condvar_3)
   TEST_ENTRY  (condvar_4)
   TEST_ENTRY  (condvar_5)
+  TEST_ENTRY  (condvar_6)
   TEST_ENTRY  (semaphore_1)
   TEST_ENTRY  (semaphore_2)
   TEST_ENTRY  (semaphore_3)
@@ -455,6 +475,7 @@ TASK_LIST_START
   TEST_ENTRY  (tty_pty)
   TEST_ENTRY  (stdio_over_pipes)
   TEST_ENTRY  (ip6_pton)
+  TEST_ENTRY  (connect_unspecified)
   TEST_ENTRY  (ipc_listen_before_write)
   TEST_ENTRY  (ipc_listen_after_write)
 #ifndef _WIN32
@@ -518,6 +539,7 @@ TASK_LIST_START
   TEST_ENTRY  (tcp_bind_error_inval)
   TEST_ENTRY  (tcp_bind_localhost_ok)
   TEST_ENTRY  (tcp_bind_invalid_flags)
+  TEST_ENTRY  (tcp_bind_writable_flags)
   TEST_ENTRY  (tcp_listen_without_bind)
   TEST_ENTRY  (tcp_connect_error_fault)
   TEST_ENTRY  (tcp_connect_timeout)
@@ -664,6 +686,7 @@ TASK_LIST_START
   TEST_ENTRY  (get_currentexe)
 
   TEST_ENTRY  (process_title)
+  TEST_ENTRY  (process_title_threadsafe)
 
   TEST_ENTRY  (cwd_and_chdir)
 
@@ -740,9 +763,11 @@ TASK_LIST_START
   TEST_ENTRY  (spawn_reads_child_path)
   TEST_ENTRY  (spawn_inherit_streams)
   TEST_ENTRY  (spawn_quoted_path)
+  TEST_ENTRY  (spawn_tcp_server)
   TEST_ENTRY  (fs_poll)
   TEST_ENTRY  (fs_poll_getpath)
   TEST_ENTRY  (kill)
+  TEST_ENTRY  (kill_invalid_signum)
 
   TEST_ENTRY  (poll_close_doesnt_corrupt_stack)
   TEST_ENTRY  (poll_closesocket)
@@ -798,6 +823,7 @@ TASK_LIST_START
   TEST_ENTRY  (fs_symlink)
   TEST_ENTRY  (fs_symlink_dir)
 #ifdef _WIN32
+  TEST_ENTRY  (fs_symlink_junction)
   TEST_ENTRY  (fs_non_symlink_reparse_point)
 #endif
   TEST_ENTRY  (fs_stat_missing_path)
@@ -805,6 +831,9 @@ TASK_LIST_START
   TEST_ENTRY  (fs_file_open_append)
   TEST_ENTRY  (fs_event_watch_dir)
   TEST_ENTRY  (fs_event_watch_dir_recursive)
+#ifdef _WIN32
+  TEST_ENTRY  (fs_event_watch_dir_short_path)
+#endif
   TEST_ENTRY  (fs_event_watch_file)
   TEST_ENTRY  (fs_event_watch_file_exact_path)
   TEST_ENTRY  (fs_event_watch_file_twice)
@@ -832,17 +861,13 @@ TASK_LIST_START
   TEST_ENTRY  (fs_read_write_null_arguments)
   TEST_ENTRY  (fs_file_pos_after_op_with_offset)
   TEST_ENTRY  (fs_null_req)
+#ifdef _WIN32
+  TEST_ENTRY  (fs_exclusive_sharing_mode)
+#endif
   TEST_ENTRY  (get_osfhandle_valid_handle)
   TEST_ENTRY  (threadpool_queue_work_simple)
   TEST_ENTRY  (threadpool_queue_work_einval)
-#if defined(__PPC__) || defined(__PPC64__)  /* For linux PPC and AIX */
-  /* pthread_join takes a while, especially on AIX.
-   * Therefore being gratuitous with timeout.
-   */
-  TEST_ENTRY_CUSTOM (threadpool_multiple_event_loops, 0, 0, 120000)
-#else
   TEST_ENTRY  (threadpool_multiple_event_loops)
-#endif
   TEST_ENTRY  (threadpool_cancel_getaddrinfo)
   TEST_ENTRY  (threadpool_cancel_getnameinfo)
   TEST_ENTRY  (threadpool_cancel_work)
@@ -861,6 +886,10 @@ TASK_LIST_START
   TEST_ENTRY  (ip6_addr_link_local)
 
   TEST_ENTRY  (queue_foreach_delete)
+
+  TEST_ENTRY  (handle_type_name)
+  TEST_ENTRY  (req_type_name)
+  TEST_ENTRY  (getters_setters)
 
 #ifndef _WIN32
   TEST_ENTRY  (fork_timer)

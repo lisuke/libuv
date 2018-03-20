@@ -31,8 +31,8 @@
 #include "stream-inl.h"
 #include "req-inl.h"
 
-#include <AclAPI.h>
-#include <AccCtrl.h>
+#include <aclapi.h>
+#include <accctrl.h>
 
 typedef struct uv__ipc_queue_item_s uv__ipc_queue_item_t;
 
@@ -847,6 +847,7 @@ static void uv_pipe_queue_accept(uv_loop_t* loop, uv_pipe_t* handle,
     return;
   }
 
+  /* Wait for completion via IOCP */
   handle->reqs_pending++;
 }
 
